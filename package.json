@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app"
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,5 +14,8 @@
     "await-to-js": "^2.1.1",
     "cors": "^2.8.5",
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.15"
   }
 }

@@ -1,31 +1,32 @@
 const express = require("express")
-const cors = require("cors")
 const to = require('await-to-js').default
+const _ = require("lodash")
 const { Client } = require("@elastic/elasticsearch")
 const client = new Client({node: 'http://localhost:9200'})
 const app = express()
-app.use(cors())
 app.use(express.json())
 
 const index = 'posts'
 
-app.get('/', (req,res)=>{
-    res.send('go to /posts')
-})
 
-app.get('/posts', async(req,res)=>{
+app.get('/api/posts', async(req,res)=>{
     let parameters = {
         index,
         size: 1000
     }
     let [ error, result] = await to(client.search(parameters))
+    let items = _.get(result, 'body.hits.hits')
+    let outputData = _.map(items, (currentItem) => {
+        return _.assign({ id: currentItem._id}, currentItem._source)
+    })
+
     if(error){
         res.send(error)
     }
-    res.send(JSON.stringify(result))
+    res.json(outputData)
 })
 
-app.get('/posts/:id', async(req,res)=>{
+app.get('/api/posts/:id', async(req,res)=>{
     const { id } = req.params
     let parameters ={
         index,
@@ -39,11 +40,18 @@ app.get('/posts/:id', async(req,res)=>{
     if(error){
         res.send(error)
     }
-    res.send(JSON.stringify(result))
+    let item =_.get(result,"body.hits.hits[0]")
+    let outputItem = _.assign( { id: item._id}, item._source)
+    if(outputItem){
+       res.json(outputItem)
+    } else {
+        console.log("item not found")
+    }
+
 
 })
 
-app.post('/posts', async (req, res)=>{
+app.post('/api/posts', async (req, res)=>{
     const { title, author, imageURL, content} = req.body
     let parameters = {
         index,
@@ -62,7 +70,7 @@ app.post('/posts', async (req, res)=>{
     res.send('adding a post')
 })
 
-app.delete('/posts/:id', async(req,res)=>{
+app.delete('/api/posts/:id', async(req,res)=>{
     const { id } = req.params
     let parameters = {
         id,
@@ -75,7 +83,7 @@ app.delete('/posts/:id', async(req,res)=>{
     res.send("deleting a post")
 })
 
-app.put('/posts/:id', async(req, res)=>{
+app.put('/api/posts/:id', async(req, res)=>{
     const { id } = req.params
     const { title,imageURL, content}=req.body
     let parameters = {
@@ -98,5 +106,5 @@ app.put('/posts/:id', async(req, res)=>{
 })
 
 app.listen(4000,()=>{
-    console.log('server is running')
+    console.log('server is running at 4000')
 })
