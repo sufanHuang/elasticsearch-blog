@@ -1,3 +1,11 @@
-# elasticsearch-blog
+# elasticsearch-blog-admin-app
 
-A simple backend CRUD app using express and elasticsearch.
+ <div align="center">
+     <img src="/elastic-blog.png" width="700px"</img> 
+ </div>
+
+## Tools:
+ 
+
+* Frontend: create-react-app, bootstrap,fontawesome.
+* Backend: node, express, elasticsearch, Docker.
